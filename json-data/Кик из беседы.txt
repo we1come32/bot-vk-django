@@ -1,0 +1,47 @@
+Особенности:
+- from_id != member_id
+- type = chat_kick_user
+
+{
+    'type': 'message_new', 
+    'object': 
+    {
+        'message': 
+        {
+            'date': 1588507978, 
+            'from_id': 367833544, 
+            'id': 0, 
+            'out': 0, 
+            'peer_id': 2000001070, 
+            'text': '', 
+            'conversation_message_id': 21395, 
+            'action': 
+            {
+                'type': 'chat_kick_user', 
+                'member_id': 505668775
+            }, 
+            'fwd_messages': [], 
+            'important': False, 
+            'random_id': 0, 
+            'attachments': [], 
+            'is_hidden': False
+        }, 
+        'client_info': 
+        {
+            'button_actions': 
+            [
+                'text', 
+                'vkpay', 
+                'open_app', 
+                'location', 
+                'open_link'
+            ], 
+            'keyboard': True, 
+            'inline_keyboard': True, 
+            'lang_id': 0
+        }
+    }, 
+    'group_id': 167676095, 
+    'event_id': '4f8901906f55a52bcd6ec0a7794c27da85551e14', 
+    'secret': '7jh50QnexQGMTbSzky'
+}

@@ -1,0 +1,43 @@
+{
+    'type': 'message_new', 
+    'object': 
+    {
+        'message': 
+        {
+            'date': 1588516976, 
+            'from_id': 367833544, 
+            'id': 0, 
+            'out': 0, 
+            'peer_id': 2000001343, 
+            'text': '', 
+            'conversation_message_id': 147, 
+            'action': 
+            {
+                'type': 'chat_title_update', 
+                'text': 'Тест ебаной мухи 2'
+            }, 
+            'fwd_messages': [], 
+            'important': False, 
+            'random_id': 0, 
+            'attachments': [], 
+            'is_hidden': False
+        }, 
+        'client_info': 
+        {
+            'button_actions': 
+            [
+                'text', 
+                'vkpay', 
+                'open_app', 
+                'location', 
+                'open_link'
+            ], 
+            'keyboard': True, 
+            'inline_keyboard': True, 
+            'lang_id': 0
+        }
+    }, 
+    'group_id': 167676095, 
+    'event_id': '2b7cf86be6103fb53042d1c94c778ee19dcc1e3e', 
+    'secret': '7jh50QnexQGMTbSzky'
+}

@@ -1,0 +1,49 @@
+{
+    'type': 'message_new', 
+    'object': 
+    {
+        'message': 
+        {
+            'date': 1588523106, 
+            'from_id': 367833544, 
+            'id': 0, 
+            'out': 0, 
+            'peer_id': 2000001343, 
+            'text': 'Переслал сообщение', 
+            'conversation_message_id': 204, 
+            'fwd_messages': 
+            [
+                {
+                    'date': 1588520016, 
+                    'from_id': 367833544, 
+                    'text': 'What???', 
+                    'attachments': [], 
+                    'conversation_message_id': 200, 
+                    'peer_id': 2000000170, 
+                    'id': 1750417
+                }
+            ], 
+            'important': False,
+            'random_id': 0, 
+            'attachments': [], 
+            'is_hidden': False
+        }, 
+        'client_info': 
+        {
+            'button_actions': 
+            [
+                'text', 
+                'vkpay', 
+                'open_app', 
+                'location', 
+                'open_link'
+            ], 
+            'keyboard': True, 
+            'inline_keyboard': True, 
+            'lang_id': 0
+        }
+    }, 
+    'group_id': 167676095, 
+    'event_id': 'bb8f09264acaaeda3c6b9d158112c0e92d11e260', 
+    'secret': '7jh50QnexQGMTbSzky'
+}

@@ -1,0 +1,47 @@
+Особенности:
+- from_id = member_id
+- type = chat_invite_user
+
+{
+    'type': 'message_new', 
+    'object': 
+    {
+        'message': 
+        {
+            'date': 1588508755, 
+            'from_id': 16212252, 
+            'id': 0, 
+            'out': 0, 
+            'peer_id': 2000001070, 
+            'text': '', 
+            'conversation_message_id': 21403, 
+            'action': 
+            {
+                'type': 'chat_invite_user', 
+                'member_id': 16212252
+            }, 
+            'fwd_messages': [], 
+            'important': False, 
+            'random_id': 0, 
+            'attachments': [], 
+            'is_hidden': False
+        }, 
+        'client_info': 
+        {
+            'button_actions': 
+            [
+                'text', 
+                'vkpay', 
+                'open_app', 
+                'location', 
+                'open_link'
+            ], 
+            'keyboard': True, 
+            'inline_keyboard': True, 
+            'lang_id': 0
+        }
+    }, 
+    'group_id': 167676095, 
+    'event_id': 'e7e5fce8c67f5275ebd977798a9adf60b6b1828b', 
+    'secret': '7jh50QnexQGMTbSzky'
+}

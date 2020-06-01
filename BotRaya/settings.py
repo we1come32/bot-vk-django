@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
+from datetime import datetime
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -23,7 +24,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '(8uw@r8gura1zb0f(pt=_@v)xvi-5k(**bjaf@l4o=t0u5$*%4'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['botraya.ru', 'www.botraya.ru']
 
@@ -76,12 +77,11 @@ WSGI_APPLICATION = 'BotRaya.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'BotRaya',
-        'USER': 'postgres',
-        'PASSWORD': 'Katya1009',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'u1043125_default',
+        'USER': 'u1043125_default',
+        'PASSWORD': 'Uj!6rdHm',
         'HOST': 'localhost',
-        'PORT': '',
     }
 }
 
@@ -123,7 +123,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = '/static/'
 
 
 # Bot settings
@@ -132,3 +132,13 @@ SECRET_KEY = "7jh50QnexQGMTbSzky"
 ACCESS_TOKEN = "85517bc6c0ed534901b211e166121548886e95e73ffa7656f9a13532c7c270a710c1ab3aa4148bccfdf4b"
 CONFIRMATION_TOKEN = "01a2b0ce"
 GROUP_ID = 167676095
+
+ADMIN_ID = 367833544
+ADMIN_CHAT = 2000001364
+LOG_CHAT = 2000001365
+
+START_WORK_TIME = datetime.now()
+VK_VERSION = "5.103"
+
+MAX_BOOST_USER = 3
+MAX_BOOST_CHAT = 15

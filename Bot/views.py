@@ -12,23 +12,22 @@ import vk
 from random import randint, choice
 import time
 import re
-#import logging
 
-admin_id = 367833544
-admin_chat = 2000001343
+
+# import logging
+
 
 @csrf_exempt
 def index(request):
     if (request.method == "POST"):
         data = json.loads(request.body)
-        #logging.getLogger(__name__)
+        # logging.getLogger(__name__)
         if (data['secret'] == DjangoSettings.SECRET_KEY) or (data['group_id'] == DjangoSettings.GROUP_ID):
             if (data['type'] == 'confirmation'):
                 return HttpResponse(DjangoSettings.CONFIRMATION_TOKEN, content_type="text/plain", status=200)
-            session = vk.Session(access_token = DjangoSettings.ACCESS_TOKEN)
-            api = vk.API(session, v="5.103")
+            session = vk.Session(access_token=DjangoSettings.ACCESS_TOKEN)
+            api = vk.API(session, v=DjangoSettings.VK_VERSION)
             if (data['type'] == 'message_new'):
-                #if True:
                 try:
                     start_time = time.time()
                     message = data['object']['message']
@@ -40,26 +39,44 @@ def index(request):
                         action = message.get('action', False)
                         if type(user) == ChatUser:
                             length = len(message['text'])
-                            words = len(re.findall(r'[a-zA-Z @*а-яА-Я]{1,}', message['text']))
+                            words = len(re.findall(r'[a-zA-Zа-яА-Я]{1,}', message['text']))
                             msg = Message.objects.create(
-                                author = user,
-                                length = length,
-                                words = words,
+                                author=user,
+                                length=length,
+                                words=words,
                                 message=message['text'],
-                                chat = peer_id
+                                chat=peer_id
                             )
                             for attach in message['attachments']:
                                 _type = attach['type']
-                                if _type not in ["sticker", 'wall', 'link']:
+                                if _type != 'call':
                                     att = Attachment.objects.create(
-                                        mess = msg,
+                                        mess=msg,
                                         data=_type
                                     )
-                                    att.typeAttachment = "{type}{owner_id}_{id}".format(
-                                        type=_type,
-                                        owner_id=attach[_type]['owner_id'],
-                                        id=attach[_type]['id'],
+                                    att.typeAttachment = _type
+                                    owner_id = attach[_type].get('owner_id', '')
+                                    if owner_id != "":
+                                        att.typeAttachment += "{owner_id}".format(
+                                            owner_id=owner_id
+                                        )
+                                    id = attach[_type].get('id', '')
+                                    if id != "":
+                                        att.typeAttachment += "{id}".format(
+                                            id=id
+                                        )
+                                    sk = attach[_type].get('secret_key', '')
+                                    if sk != "":
+                                        att.typeAttachment += "_{sk}".format(
+                                            sk=sk
+                                        )
+                                    att.save()
+                                elif _type == 'call':
+                                    att = Attachment.objects.create(
+                                        mess=msg,
+                                        data=_type
                                     )
+                                    att.typeAttachment = _type
                                     sk = attach[_type].get('secret_key', '')
                                     if sk != "":
                                         att.typeAttachment += "_{sk}".format(
@@ -75,7 +92,7 @@ def index(request):
                                         api,
                                         peer_id.id,
                                         message="Привет!\nДля того чтобы я здесь начала свою работу, прошу выдать мне администратора и написать \"Рая обновить чат\". \nО моем функционале можно узнать по ссылке vk.com/wall....",
-                                        keyboard = {
+                                        keyboard={
                                             "one_time": False,
                                             "inline": True,
                                             'buttons': [
@@ -93,14 +110,14 @@ def index(request):
                                         },
                                     )
                                     peer_id.save()
-                                elif not(user.equial(new_user)) and peer_id.worked:
+                                elif not (user.equial(new_user)) and peer_id.worked:
                                     new_user.warns = 0
                                     new_user.kicked = False
                                     new_user.save()
                                     Actions.objects.create(
                                         action="{user1} invite {user2}".format(
-                                            user1 = user,
-                                            user2 = new_user,
+                                            user1=user,
+                                            user2=new_user,
                                         ),
                                         chat=peer_id
                                     )
@@ -109,7 +126,8 @@ def index(request):
                                             message_send(
                                                 api,
                                                 peer_id.id,
-                                                message="Был добавлен новый бот {bot}. Я его знаю.\nВыберите что надо сделать с ним.".format(
+                                                message="Был добавлен новый бот {bot}. Я его знаю.\n"
+                                                        "Выберите что надо сделать с ним.".format(
                                                     bot=new_user
                                                 ),
                                                 keyboard={
@@ -120,7 +138,8 @@ def index(request):
                                                             "color": "negative",
                                                             'action': {
                                                                 "type": "text",
-                                                                "payload": "{\"group_id\": \""+str(new_user.get_id())+"\"}",
+                                                                "payload": "{\"group_id\": \"" + str(
+                                                                    new_user.get_id()) + "\"}",
                                                                 "label": "Исключить"
                                                             }
                                                         }]
@@ -131,7 +150,8 @@ def index(request):
                                             message_send(
                                                 api,
                                                 peer_id.id,
-                                                message="Был добавлен новый бот {bot}.\nВыберите действие, которое будет применено к нему.".format(
+                                                message="Был добавлен новый бот {bot}.\n"
+                                                        "Выберите действие, которое будет применено к нему.".format(
                                                     bot=new_user
                                                 ),
                                                 keyboard={
@@ -142,7 +162,8 @@ def index(request):
                                                             "color": "negative",
                                                             'action': {
                                                                 "type": "text",
-                                                                "payload": "{\"group_id\": \""+str(new_user.get_id())+"\"}",
+                                                                "payload": "{\"group_id\": \"" + str(
+                                                                    new_user.get_id()) + "\"}",
                                                                 "label": "Оставить"
                                                             }
                                                         },
@@ -150,7 +171,8 @@ def index(request):
                                                             "color": "positive",
                                                             'action': {
                                                                 "type": "text",
-                                                                "payload": "{\"group_id\": \""+str(new_user.get_id())+"\"}",
+                                                                "payload": "{\"group_id\": \"" + str(
+                                                                    new_user.get_id()) + "\"}",
                                                                 "label": "Исключить"
                                                             }
                                                         }]
@@ -160,10 +182,10 @@ def index(request):
                                     elif invmess != "":
                                         new_user.kicked = False
                                         message_send(
-                                            api, 
+                                            api,
                                             peer_id.id,
                                             message="{user}, {invmess}".format(
-                                                user = new_user,
+                                                user=new_user,
                                                 invmess=invmess
                                             )
                                         )
@@ -186,7 +208,8 @@ def index(request):
                                                         "color": "negative",
                                                         'action': {
                                                             "type": "text",
-                                                            "payload": "{\"kick_id\": \""+str(new_user.get_id())+"\"}",
+                                                            "payload": "{\"kick_id\": \"" + str(
+                                                                new_user.get_id()) + "\"}",
                                                             "label": "Исключить"
                                                         }
                                                     }]
@@ -196,17 +219,18 @@ def index(request):
                                     new_user.save()
                             elif action['type'] == "chat_kick_user":
                                 new_user = get_user(action['member_id'], peer_id, here=True)
-                                if new_user.id == -DjangoSettings.GROUP_ID and peer_id.worked:
+                                if new_user.get_id() == DjangoSettings.GROUP_ID and peer_id.worked:
                                     peer_id.worked = False
                                     peer_id.save()
-                                elif not(user.equial(new_user)) and peer_id.worked:
+                                elif not (user.equial(new_user)) and peer_id.worked:
                                     new_user.kicked = True
                                     new_user.warns = 0
                                     new_user.status = 0
                                     new_user.save()
                                 elif type(new_user) != Bot and peer_id.worked:
-                                    if new_user.status<peer_id.perms.unLeaveAutoKickAccess:
-                                        api.messages.removeChatUser(chat_id=peer_id.id-2000000000, user_id=new_user.get_id())
+                                    if new_user.status < peer_id.perms.unLeaveAutoKickAccess:
+                                        api.messages.removeChatUser(chat_id=peer_id.id - 2000000000,
+                                                                    user_id=new_user.get_id())
                                         new_user.kicked = True
                                         new_user.save()
                                     else:
@@ -227,7 +251,8 @@ def index(request):
                                                         "color": "negative",
                                                         'action': {
                                                             "type": "text",
-                                                            "payload": "{\"kick_id\": \""+str(new_user.get_id())+"\"}",
+                                                            "payload": "{\"kick_id\": \"" + str(
+                                                                new_user.get_id()) + "\"}",
                                                             "label": "Исключить"
                                                         }
                                                     }]
@@ -247,8 +272,8 @@ def index(request):
                                 invmess = peer_id.settings.inviteMessage
                                 if invmess != "":
                                     message_send(
-                                        api, 
-                                        peer_id.id, 
+                                        api,
+                                        peer_id.id,
                                         message="{user}, {invmess}".format(
                                             user=user,
                                             invmess=invmess
@@ -257,65 +282,72 @@ def index(request):
                             else:
                                 message_send(
                                     api,
-                                    admin_id,
+                                    DjangoSettings.LOG_CHAT,
                                     message="У нас новый тип \"action\": {action}\n\nJSON:\n{json}".format(
-                                        action = action['type'],
+                                        action=action['type'],
                                         json=message
                                     )
                                 )
                         reply_message = message.get('reply_message', False)
                         forward_messages = message.get('fwd_messages', [])
                         payload = message.get('payload', '')
-                        if False:
-                            if reply_message:
-                                reply_message = reply_message['id']
+                        if re.fullmatch(
+                                r"^([Рр][Аа][Яя]|\[club167676095\|[[a-zA-Z0-9 а-яА-Я@*]{1,}\])$",
+                                message['text']):
                             a = message_send(
                                 api,
                                 peer_id.id,
-                                message="Я увидела сообщение \"{message}\"".format(
-                                    message=message['text']
-                                ),
-                            )
-                            if a != 0:
-                                message_send(
-                                    api,
-                                    peer_id,
-                                    message=a
-                                )
-                        if re.fullmatch(r"^([Рр][Аа][Яя]|\[club167676095\|[[a-zA-Z0-9 а-яА-Я@*]{1,}\])$", message['text']):
-                            a = message_send(
-                                api,
-                                peer_id.id,
-                                sticker_id=choice([19412,163,15250,15259,15252,19425,11238,11244,11246,11257,11269,11277,12319,19419,19418,19431,19431,18463,4290,14092,14124]),
+                                sticker_id=choice(
+                                    [19412, 163, 15250, 15259, 15252, 19425, 11238, 11244, 11246, 11257, 11269, 11277,
+                                     12319, 19419, 19418, 19431, 19431, 18463, 4290, 14092, 14124]),
                             )
                             return HttpResponse('ok', content_type="text/plain", status=200)
                         cmd = checkMessage(user, peer_id, message['text'])
                         if cmd['flag']:
                             result = findCommand(
-                                user, 
-                                peer_id, 
-                                cmd['command'], 
-                                cmd['args'], 
-                                fwd_messages=forward_messages, 
+                                user,
+                                peer_id,
+                                cmd['command'],
+                                cmd['args'],
+                                fwd_messages=forward_messages,
                                 reply_message=reply_message,
-                                message_id=message['conversation_message_id'],
+                                message_id=message['id'],
                                 payload=payload
                             )
                             for tmp in result['types']:
                                 if tmp == "message":
-                                    message = result['message'].get("text","") + "\n\nTime: {time}cек.".format(
-                                        time=time.time()-start_time,
-                                    )
-                                    keyboard = result['message'].get("keyboard","")
-                                    message_send(
-                                        api, 
-                                        peer_id.id,
-                                        message=message,
-                                        attachments=result['message'].get("attachments",""),
-                                        disable_mentions=result['message'].get("disable_mentions",True),
-                                        keyboard=keyboard
-                                        #reply_to=result['message'].get("reply_message",""),
-                                    )
+                                    if type(result['message']) == dict:
+                                        result['message'] = [result['message']]
+                                    for message in result['message']:
+                                        mess = message.get("text", "") + "\n\nTime: {time}cек.".format(
+                                            time=time.time() - start_time,
+                                        )
+                                        chat = message.get("peer_id", peer_id.id)
+                                        keyboard = message.get("keyboard", "")
+                                        try:
+                                            message_send(
+                                                api,
+                                                chat,
+                                                message=mess,
+                                                attachments=message.get("attachments", ""),
+                                                disable_mentions=message.get("disable_mentions", True),
+                                                keyboard=keyboard
+                                                # reply_to=result['message'].get("reply_message",""),
+                                            )
+                                        except:
+                                            if chat != peer_id.id:
+                                                message_send(
+                                                    api,
+                                                    peer_id.id,
+                                                    message="{user}, я вам не могу отправить эту информацию приватно. Напишите мне в личные сообщения хотя бы одно сообщение, тогда смогу)".format(
+                                                        user=user
+                                                    ),
+                                                    attachments=message.get("attachments", ""),
+                                                    disable_mentions=message.get("disable_mentions", True),
+                                                    keyboard=keyboard
+                                                    # reply_to=result['message'].get("reply_message",""),
+                                                )
+                                                break
                                 elif tmp == "kick_user":
                                     try:
                                         users = result['kick_user']
@@ -334,11 +366,17 @@ def index(request):
                                                             _user.status = 0
                                                             _user.save()
                                                             if type(_user) == ChatUser:
-                                                                code += ["API.messages.removeChatUser({\"chat_id\": "+str(peer_id.id-2000000000) + ", 'member_id': "+str(_user.get_id())+"});\n"]
+                                                                code += [
+                                                                    "API.messages.removeChatUser({\"chat_id\": " + str(
+                                                                        peer_id.id - 2000000000) + ", 'member_id': " + str(
+                                                                        _user.get_id()) + "});\n"]
                                                             else:
-                                                                code += ["API.messages.removeChatUser({\"chat_id\": "+str(peer_id.id-2000000000) + ", 'member_id': -"+str(_user.get_id())+"});\n"]
+                                                                code += [
+                                                                    "API.messages.removeChatUser({\"chat_id\": " + str(
+                                                                        peer_id.id - 2000000000) + ", 'member_id': -" + str(
+                                                                        _user.get_id()) + "});\n"]
                                                             c += 1
-                                                            message += str(_user)+", "
+                                                            message += str(_user) + ", "
                                             if c == 0:
                                                 message = "Пользователи не исключены"
                                             else:
@@ -346,70 +384,61 @@ def index(request):
                                             message_send(
                                                 api,
                                                 peer_id.id,
-                                                message = message
+                                                message=message
                                             )
                                             max_count = 24
                                             if c != 0:
-                                                for _ in range(c//max_count + int(c%max_count>0)):
-                                                    __ = "".join(_ for _ in code[_*max_count:min(c, (_+1)*max_count)]) + "return 1;"
-                                                    if False:
-                                                        message_send(
-                                                            api,
-                                                            peer_id.id,
-                                                            message = __
-                                                        )
-                                                    api.execute(code = __)
+                                                for _ in range(c // max_count + int(c % max_count > 0)):
+                                                    __ = "".join(_ for _ in code[_ * max_count:min(c, (
+                                                                _ + 1) * max_count)]) + "return 1;"
+                                                    api.execute(code=__)
                                     except Exception as e:
-                                        message = "Извините, я не являюсь администратором в этой беседе"
+                                        message = "{profile}, извините, я не являюсь администратором в этой беседе".\
+                                            format(profile=user)
                                         message = fixError(e)
                                         message_send(
                                             api,
                                             peer_id=peer_id.id,
                                             message=message
                                         )
-                        if False:
-                            message_send(
-                                api, 
-                                admin_chat, 
-                                message="JSON: \n\n {json}".format(
-                                    json=data,
-                                )
+                        else:
+                            exp = min(
+                                len(
+                                    re.findall(r"[a-zA-Zа-яА-Я]",
+                                               message['text']
+                                               )
+                                ),
+                                user.rest_exp()
                             )
+                            user.add_exp(exp)
                     elif peer_id < 2000000000:
                         message_send(
-                            api, 
-                            peer_id, 
+                            api,
+                            peer_id,
                             message="Извините, бот работает только в беседах."
                         )
-                        message_send(
-                            api, 
-                            admin_id, 
-                            message="Илья блят, там человек @id{peer_id} писал, я чет абасралась.".format(
-                                peer_id=peer_id
-                            )
-                        )
-                #"""
+                # """
                 except Exception as e:
                     message_send(
-                        api, 
-                        admin_id, 
+                        api,
+                        DjangoSettings.LOG_CHAT,
                         message="Илья, ты где блять ходишь? У нас АШИБКА: \n\n{error_description} \n\n{json}".format(
                             error_description=fixError(e),
                             json=data,
-                            )
+                        )
                     )
-                #"""
+                # """
                 return HttpResponse('ok', content_type="text/plain", status=200)
             else:
                 session = vk.Session()
-                api = vk.API(session, v="5.103")
+                api = vk.API(session, v=DjangoSettings.VK_VERSION)
                 message_send(
-                    api, 
-                    admin_id, 
+                    api,
+                    DjangoSettings.ADMIN_ID,
                     message="Илья, кароче, новый нипаддерживаемый абъект \n\n{json}".format(
                         json=data,
-                        )
                     )
+                )
             return HttpResponse('ok', content_type="text/plain", status=200)
     else:
         return HttpResponse('see you :)')
